@@ -1,4 +1,3 @@
-
 defprotocol Monad do
   def bind(xs, f)
 end
@@ -9,7 +8,7 @@ end
 
 defimpl Monad, for: Tuple do
   def bind({:ok, x}, f), do: f.(x)
-  def bind({:error,_} = error), do: error
+  def bind({:error, _} = error), do: error
 end
 
 defmodule MonadBehaviour do
