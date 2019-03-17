@@ -1,8 +1,6 @@
-defmodule LinkedList do
-  defstruct [
-    :next,
-    :value
-  ]
+defmodule Item do
+  defstruct next: nil,
+            value: :__none__
 
   def new do
     %__MODULE__{}
@@ -11,42 +9,51 @@ defmodule LinkedList do
   def new(value) do
     %__MODULE__{value: value}
   end
-end
 
-defimpl Collectable, for: LinkedList do
-  def into(enum) do
-    f = fn
-      [], {:cont, curr} -> %LinkedList{next: nil, value: curr}
-      acc, {:cont, curr} -> %LinkedList{next: acc, value: curr}
-      acc, :done -> acc
-      _, :halt -> :ok
-    end
-
-    {Enum.reverse(enum), f}
+  def prepend(%__MODULE__{} = item, value) do
+    %__MODULE__{next: item, value: value}
   end
 end
 
-defimpl Enumerable, for: LinkedList do
+defimpl Collectable, for: Item do
+  @doc """
+  Currently does not preserve order
+  """
+  def into(enum) do
+    f = fn
+      %Item{value: :__none__}, {:cont, curr} ->
+        Item.new(curr)
+
+      acc, {:cont, curr} ->
+        Item.prepend(acc, curr)
+
+      acc, :done ->
+        acc
+
+      _, :halt ->
+        :ok
+    end
+
+    {enum, f}
+  end
+end
+
+defimpl Enumerable, for: Item do
   @doc """
   Handles `:halt` for `Enum.reduce_while/3`
   Handles `:suspend` for ...suspending
-  Handles stopping at the end of the `LinkedList`
+  Handles stopping at the end of the `Item`
   Handles when there are more elements to process
   """
   def reduce(_enum, {:halt, acc}, _f), do: {:halted, acc}
   def reduce(enum, {:suspend, acc}, f), do: {:suspended, acc, &reduce(enum, &1, f)}
 
-  # Needed for Collectable
-  def reduce(%LinkedList{next: nil, value: nil}, {:cont, acc}, _f) do
-    {:done, acc}
-  end
-
-  def reduce(%LinkedList{next: nil, value: value}, {:cont, acc}, f) do
+  def reduce(%Item{next: nil, value: value}, {:cont, acc}, f) do
     {:cont, acc} = f.(value, acc)
     {:done, acc}
   end
 
-  def reduce(%LinkedList{next: next, value: value}, {:cont, acc}, f),
+  def reduce(%Item{next: next, value: value}, {:cont, acc}, f),
     do: reduce(next, f.(value, acc), f)
 
   @doc """
@@ -62,5 +69,5 @@ defimpl Enumerable, for: LinkedList do
   @doc """
   Returning `{:error, __MODULE__}` derives a default implementation based on `reduce/3`
   """
-  def slice(__enum), do: {:error, __MODULE__}
+  def slice(_enum), do: {:error, __MODULE__}
 end
