@@ -7,7 +7,7 @@ defimpl Functor, for: List do
 end
 
 defimpl Functor, for: BitString do
-  def fmap(xs, f), do: Regex.replace(~r/\w/, xs, f)
+  def fmap(xs, f), do: Regex.replace(~r/./, xs, f)
 end
 
 defimpl Functor, for: Tuple do

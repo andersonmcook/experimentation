@@ -21,6 +21,7 @@ defimpl Monoid, for: BitString do
 
   @doc """
   Defining an implementation A for data type B will give you a module A.B
+  Delegates to `Monoid.List` because lists are passed to `mconcat/1`
   """
   defdelegate mconcat(xs), to: Monoid.List
   def mempty(_), do: ""
