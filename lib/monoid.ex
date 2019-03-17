@@ -7,13 +7,22 @@ end
 
 defimpl Monoid, for: List do
   def mappend(x, y), do: x ++ y
-  def mconcat(xs), do: List.foldr(xs, [], &mappend/2)
+
+  @doc """
+  Calls to `Monoid.mempty/1` and `Monoid.mappend/2` instead of local
+  to be able to work with lists of strings
+  """
+  def mconcat([x | _] = xs), do: List.foldr(xs, Monoid.mempty(x), &Monoid.mappend/2)
   def mempty(_), do: []
 end
 
 defimpl Monoid, for: BitString do
   def mappend(x, y), do: x <> y
-  def mconcat(xs), do: List.foldr(xs, "", &mappend/2)
+
+  @doc """
+  Defining an implementation A for data type B will give you a module A.B
+  """
+  defdelegate mconcat(xs), to: Monoid.List
   def mempty(_), do: ""
 end
 
