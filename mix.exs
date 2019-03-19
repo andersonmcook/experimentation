@@ -7,7 +7,46 @@ defmodule Monad.MixProject do
       version: "0.1.0",
       elixir: "~> 1.6",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      # Docs
+      docs: [
+        main: "Monoid",
+        extras: ["README.md"],
+        groups_for_functions: [
+          Callbacks: & &1[:callback]
+        ],
+        groups_for_modules: [
+          "Behaviours": [
+            FunctorBehaviour,
+            MonadBehaviour,
+            MonoidBehaviour,
+            SemigroupBehaviour
+          ],
+          "Category Theory": [
+            Functor,
+            Monad,
+            Monoid
+          ],
+          "Custom Data Type": [
+            Item
+          ],
+          "Functors": [
+            ListFunctor,
+            OKFunctor,
+            StringFunctor
+          ],
+          "Monads": [
+            ListMonad,
+            OKMonad
+          ],
+          "Monoids": [
+            AdditionMonoid,
+            ListMonoid,
+            StringMonoid,
+            StructMonoid
+          ]
+        ]
+      ]
     ]
   end
 
@@ -21,8 +60,7 @@ defmodule Monad.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      # {:dep_from_hexpm, "~> 0.3.0"},
-      # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"},
+      {:ex_doc, "~> 0.19", only: :dev, runtime: false}
     ]
   end
 end

@@ -21,9 +21,17 @@ defmodule FunctorBehaviour do
 end
 
 defmodule ListFunctor do
+  @moduledoc """
+  Implementation of `FunctorBehaviour` for `List`s.
+  """
   @behaviour FunctorBehaviour
 
   @impl true
+  @spec fmap([term()], (term() -> term())) :: [term()]
+  @doc callback: true
+  @doc """
+  Implements `c:FunctorBehaviour.fmap/2` for `List`s.
+  """
   def fmap(xs, f) do
     Enum.map(xs, f)
   end
