@@ -24,3 +24,7 @@ monad-*.tar
 
 # Etc
 .DS_Store
+
+
+.vscode
+.elixir_ls
