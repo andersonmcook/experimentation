@@ -11,6 +11,7 @@ defmodule Lens do
 
   # TODO: have this be a protocol for different types? like you can't always use Map.get
   # TODO: use a protocol so you don't have declare the type? or...do we want to use a protocol? you gotta know something about the structure to even define the lens?
+  # TODO: what should the API look like? what's nicest to use?
 
   def new(key, :map) do
     %__MODULE__{
@@ -36,6 +37,11 @@ defmodule Lens do
     }
   end
 
+  # TODO: do this or use an unthrown exception or error tuple?
+  def over(_, nil, _) do
+    nil
+  end
+
   def over(%__MODULE__{get: get, set: set}, coll, f) do
     set.(
       coll,
@@ -45,8 +51,18 @@ defmodule Lens do
     )
   end
 
+  # TODO: do this or use an unthrown exception or error tuple?
+  def set(_, nil, _) do
+    nil
+  end
+
   def set(%__MODULE__{set: set}, coll, value) do
     set.(coll, value)
+  end
+
+  # TODO: do this or use an unthrown exception or error tuple?
+  def view(_, nil) do
+    nil
   end
 
   def view(%__MODULE__{get: get}, coll) do
@@ -57,6 +73,7 @@ defmodule Lens do
 
   # TODO: make sure `set` works like we want it to
 
+  # TODO: fix, function with arity 1 called with 2 arguments
   def compose(%__MODULE__{} = lens_a, %__MODULE__{} = lens_b) do
     %__MODULE__{
       get:
@@ -64,9 +81,12 @@ defmodule Lens do
           |> lens_a.get.()
           |> lens_b.get.()),
       set:
-        &(&1
-          |> lens_a.set.()
-          |> lens_b.set.())
+        &lens_a.set.(
+          &1,
+          &1
+          |> lens_a.get.()
+          |> lens_b.set.(&2)
+        )
     }
   end
 
@@ -80,8 +100,6 @@ defmodule Lens do
 end
 
 defmodule Implementation do
-  # %{a: [nil, {"hey", "hello"}]}
-
   def example do
     %{a: [nil, {"hey", "hello"}]}
   end
