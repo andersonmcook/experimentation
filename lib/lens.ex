@@ -10,6 +10,7 @@ defmodule Lens do
   defstruct [:get, :set]
 
   # TODO: have this be a protocol for different types? like you can't always use Map.get
+  # TODO: use a protocol so you don't have declare the type? or...do we want to use a protocol? you gotta know something about the structure to even define the lens?
 
   def new(key, :map) do
     %__MODULE__{
@@ -54,65 +55,28 @@ defmodule Lens do
 
   # TODO: think through how to compose/append/etc
 
-  # def compose(%__MODULE__{} = lens_a, %__MODULE__{} = lens_b) do
-  #   %__MODULE__{
-  #     get:
-  #       &(&1
-  #         |> lens_a.get.()
-  #         |> lens_b.get.()),
-  #     set:
-  #       &(&1
-  #         |> lens_a.set.()
-  #         |> lens_b.set.())
-  #   }
-  # end
+  # TODO: make sure `set` works like we want it to
 
-  # TODO: figure out if it should actually compose, or you could define it the reverse way as `pipe`
+  def compose(%__MODULE__{} = lens_a, %__MODULE__{} = lens_b) do
+    %__MODULE__{
+      get:
+        &(&1
+          |> lens_a.get.()
+          |> lens_b.get.()),
+      set:
+        &(&1
+          |> lens_a.set.()
+          |> lens_b.set.())
+    }
+  end
+
   def compose([%__MODULE__{} | _] = lenses) do
-    Enum.reduce(lenses, fn lens_curr, lens_acc ->
-      %__MODULE__{
-        get:
-          &(&1
-            |> lens_curr.get.()
-            |> lens_acc.get.()),
-        set:
-          &(&1
-            |> lens_curr.set.()
-            |> lens_acc.set.())
-      }
-    end)
+    Enum.reduce(lenses, &compose/2)
   end
 
-  def pipe(lenses) do
-    lenses
-    |> Enum.reverse()
-    |> compose()
+  def pipe([%__MODULE__{} | _] = lenses) do
+    Enum.reduce(lenses, &compose(&2, &1))
   end
-
-  # Tuple implementation
-  # def new(key) do
-  #   {
-  #     fn coll -> Map.get(coll, key) end,
-  #     fn coll, value -> Map.put(coll, key, value) end
-  #   }
-  # end
-
-  # def over({getter, setter}, coll, f) do
-  #   setter.(
-  #     coll,
-  #     coll
-  #     |> getter.()
-  #     |> f.()
-  #   )
-  # end
-
-  # def set({_, setter}, coll, value) do
-  #   setter.(coll, value)
-  # end
-
-  # def view({getter, _}, coll) do
-  #   getter.(coll)
-  # end
 end
 
 defmodule Implementation do
