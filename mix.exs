@@ -16,7 +16,7 @@ defmodule Monad.MixProject do
           Callbacks: & &1[:callback]
         ],
         groups_for_modules: [
-          "Behaviours": [
+          Behaviours: [
             FunctorBehaviour,
             MonadBehaviour,
             MonoidBehaviour,
@@ -30,16 +30,16 @@ defmodule Monad.MixProject do
           "Custom Data Type": [
             Item
           ],
-          "Functors": [
+          Functors: [
             ListFunctor,
             OKFunctor,
             StringFunctor
           ],
-          "Monads": [
+          Monads: [
             ListMonad,
             OKMonad
           ],
-          "Monoids": [
+          Monoids: [
             AdditionMonoid,
             ListMonoid,
             StringMonoid,
@@ -60,7 +60,8 @@ defmodule Monad.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:ex_doc, "~> 0.19", only: :dev, runtime: false}
+      {:ex_doc, "~> 0.19", only: :dev, runtime: false},
+      {:ok, "~> 2.2"}
     ]
   end
 end
