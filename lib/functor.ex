@@ -6,6 +6,7 @@ defimpl Functor, for: List do
   defdelegate fmap(xs, f), to: Enum, as: :map
 end
 
+# Strings aren't functors
 defimpl Functor, for: BitString do
   def fmap(xs, f), do: Regex.replace(~r/./, xs, f)
 end
@@ -27,11 +28,11 @@ defmodule ListFunctor do
   @behaviour FunctorBehaviour
 
   @impl true
-  @spec fmap([term()], (term() -> term())) :: [term()]
   @doc callback: true
   @doc """
   Implements `c:FunctorBehaviour.fmap/2` for `List`s.
   """
+  @spec fmap([term()], (term() -> term())) :: [term()]
   def fmap(xs, f) do
     Enum.map(xs, f)
   end
